@@ -1,27 +1,48 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import "./App.css";
 
 function App() {
-	const [data, setData] = useState(null);
-
+	const [podcast, setPodcast] = useState(null);
+	const [loading, setLoading] = useState(true);
 	useEffect(() => {
-		fetch("routes/api/sysk.js")
-			.then((response) => response.json())
-			.then((data) => setData(data))
-			.catch((error) => console.error("Error:", error));
+		async function fetchData() {
+			const response = await axios.get("/sysk");
+			setPodcast(response.data);
+			setLoading(false);
+			console.log(
+				"Fetched and parsed RSS feed:client:",
+				response.data.meta.title
+			);
+		}
+		fetchData();
 	}, []);
+	
+	if (loading) {
+		return <div>Loading...</div>;
+	}
+	console.log([podcast]);
 
 	return (
-		<main className="App">
-			{data
-				? data.map((item) => (
-						<div key={item.guid}>
-							<h2>{item.title}</h2>
-							<p>{item.contentSnippet}</p>
-						</div>
-				  ))
-				: "Loading..."}
-		</main>
+		<>
+			<h1>{podcast.meta.title}</h1>
+			<p>{podcast.meta.description}</p>
+			<p>{podcast.meta.author}</p>
+			<p>{podcast.meta.author}</p>
+			<p>{podcast.meta.link}</p>
+
+			{podcast.episodes.map((episode, idx) => (
+				<div key={idx}>
+					<h3>{episode.title}</h3>
+					<p>{episode.description}</p>
+					<p>{episode.enclosure.url}</p>
+					<p>{episode.enclosure.length}</p>
+					<p>{episode.enclosure.type}</p>
+					<p>{episode.guid}</p>
+					<p>{episode.pubDate}</p>
+				</div>
+			))}
+		</>
 	);
 }
 

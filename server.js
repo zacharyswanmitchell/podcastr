@@ -2,8 +2,8 @@ const express = require("express");
 const path = require("path");
 const favicon = require("serve-favicon");
 const logger = require("morgan");
+const podcastFeedParser = require("podcast-feed-parser");
 require("dotenv").config();
-
 
 // Connect to the database
 require("./config/database");
@@ -19,7 +19,18 @@ app.use(favicon(path.join(__dirname, "build", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "build")));
 
 // Put API routes here, before the "catch all" route
-
+app.get("/sysk", async (req, res) => {
+	try {
+		const podcast = await podcastFeedParser.getPodcastFromURL(
+			"https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/A91018A4-EA4F-4130-BF55-AE270180C327/44710ECC-10BB-48D1-93C7-AE270180C33E/podcast.rss"
+		);
+		console.log('Fetched and parsed RSS feed:server:', podcast.meta.title);
+    res.json(podcast);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Error fetching RSS feed" });
+	}
+});
 
 // The following "catch all" route (note the *) is necessary
 // to return the index.html on all non-AJAX requests
