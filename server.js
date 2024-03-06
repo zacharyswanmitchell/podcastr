@@ -18,12 +18,12 @@ app.use(express.json());
 app.use(favicon(path.join(__dirname, "build", "favicon.ico")));
 app.use(express.static(path.join(__dirname, "build")));
 
+const syskURL = "https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/A91018A4-EA4F-4130-BF55-AE270180C327/44710ECC-10BB-48D1-93C7-AE270180C33E/podcast.rss";
+
 // Put API routes here, before the "catch all" route
 app.get("/sysk", async (req, res) => {
 	try {
-		const podcast = await podcastFeedParser.getPodcastFromURL(
-			"https://omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/A91018A4-EA4F-4130-BF55-AE270180C327/44710ECC-10BB-48D1-93C7-AE270180C33E/podcast.rss"
-		);
+		const podcast = await podcastFeedParser.getPodcastFromURL(syskURL);
 		console.log('Fetched and parsed RSS feed:server:', podcast.meta.title);
     res.json(podcast);
 	} catch (error) {
